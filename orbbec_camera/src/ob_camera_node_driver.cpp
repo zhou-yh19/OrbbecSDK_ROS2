@@ -148,6 +148,16 @@ void OBCameraNodeDriver::init() {
   net_device_ip_ = declare_parameter<std::string>("net_device_ip", "");
   net_device_port_ = static_cast<int>(declare_parameter<int>("net_device_port", 0));
   enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", false);
+  
+  // FFmpeg image transport parameters
+  declare_parameter<std::string>("ffmpeg_image_transport.encoding", "libx264");
+  declare_parameter<std::string>("ffmpeg_image_transport.preset", "");
+  declare_parameter<std::string>("ffmpeg_image_transport.profile", "main");
+  declare_parameter<int>("ffmpeg_image_transport.gop_size", 10);
+  declare_parameter<int>("ffmpeg_image_transport.bit_rate", 8242880);
+  declare_parameter<int>("ffmpeg_image_transport.crf", 23);
+  declare_parameter<int>("ffmpeg_image_transport.qmax", 10);
+  
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
                                         const std::shared_ptr<ob::DeviceList> &added_list) {
