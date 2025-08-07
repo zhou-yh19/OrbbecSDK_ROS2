@@ -42,11 +42,19 @@ def load_parameters(context, args):
     if config_file_path:
         yaml_params = load_yaml(config_file_path)
         default_params = merge_params(default_params, yaml_params)
-    skip_convert = {'config_file_path', 'usb_port', 'serial_number'}
-    return {
-        key: (value if key in skip_convert else convert_value(value))
-        for key, value in default_params.items()
-    }
+    skip_convert = {'config_file_path', 'usb_port', 'serial_number', 'ffmpeg_encoding', 'ffmpeg_preset', 'ffmpeg_profile'}
+    
+    # Convert ffmpeg parameters to proper namespace
+    converted_params = {}
+    for key, value in default_params.items():
+        if key.startswith('ffmpeg_'):
+            # Convert ffmpeg_encoding to ffmpeg_image_transport.encoding
+            param_name = key.replace('ffmpeg_', 'ffmpeg_image_transport.')
+            converted_params[param_name] = value if key in skip_convert else convert_value(value)
+        else:
+            converted_params[key] = value if key in skip_convert else convert_value(value)
+    
+    return converted_params
 
 
 def generate_launch_description():
@@ -61,9 +69,9 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='false'),
         DeclareLaunchArgument('cloud_frame_id', default_value=''),
         DeclareLaunchArgument('connection_delay', default_value='10'),
-        DeclareLaunchArgument('color_width', default_value='0'),
-        DeclareLaunchArgument('color_height', default_value='0'),
-        DeclareLaunchArgument('color_fps', default_value='0'),
+        DeclareLaunchArgument('color_width', default_value='1280'),
+        DeclareLaunchArgument('color_height', default_value='720'),
+        DeclareLaunchArgument('color_fps', default_value='60'),
         DeclareLaunchArgument('color_format', default_value='MJPG'),
         DeclareLaunchArgument('enable_color', default_value='true'),
         DeclareLaunchArgument('color_qos', default_value='default'),
@@ -87,9 +95,9 @@ def generate_launch_description():
         DeclareLaunchArgument('color_ae_roi_top', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_right', default_value='-1'),
         DeclareLaunchArgument('color_ae_roi_bottom', default_value='-1'),
-        DeclareLaunchArgument('depth_width', default_value='0'),
-        DeclareLaunchArgument('depth_height', default_value='0'),
-        DeclareLaunchArgument('depth_fps', default_value='0'),
+        DeclareLaunchArgument('depth_width', default_value='848'),
+        DeclareLaunchArgument('depth_height', default_value='480'),
+        DeclareLaunchArgument('depth_fps', default_value='60'),
         DeclareLaunchArgument('depth_format', default_value='Y16'),
         DeclareLaunchArgument('enable_depth', default_value='true'),
         DeclareLaunchArgument('depth_qos', default_value='default'),
@@ -194,6 +202,22 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_hardware_reset', default_value='false'),
 
         DeclareLaunchArgument('frame_aggregate_mode', default_value='ANY'), # full_frame、color_frame、ANY or disable
+        
+        # FFmpeg image transport parameters
+        DeclareLaunchArgument('ffmpeg_encoding', default_value='hevc_vaapi', 
+                            description='FFmpeg encoding: libx264, libx265, h264_nvenc, hevc_nvenc'),
+        DeclareLaunchArgument('ffmpeg_preset', default_value='fast', 
+                            description='FFmpeg preset: ultrafast, fast, medium, slow, veryslow'),
+        DeclareLaunchArgument('ffmpeg_profile', default_value='main',
+                            description='FFmpeg profile: baseline, main, high'),
+        DeclareLaunchArgument('ffmpeg_gop_size', default_value='15',
+                            description='GOP size - frames between keyframes'),
+        DeclareLaunchArgument('ffmpeg_bit_rate', default_value='2000000',
+                            description='Target bitrate in bits/s'),
+        DeclareLaunchArgument('ffmpeg_crf', default_value='23',
+                            description='Constant Rate Factor (0-51, lower is better quality)'),
+        DeclareLaunchArgument('ffmpeg_qmax', default_value='10',
+                            description='Maximum quantization (higher = worse quality, better compression)'),
     ]
 
     def get_params(context, args):
