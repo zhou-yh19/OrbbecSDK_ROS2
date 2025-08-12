@@ -15,8 +15,9 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'gemini_330_series.launch.py')
         ),
         launch_arguments={
-            'camera_name': 'camera_01',
-            'usb_port': '2-1.1',
+            'camera_name': 'left',
+            'usb_port': '2-1',
+            'serial_number': 'CP053530008Z',
             'device_num': '2',
             'sync_mode': 'standalone'
         }.items()
@@ -27,8 +28,9 @@ def generate_launch_description():
             os.path.join(launch_file_dir, 'gemini_330_series.launch.py')
         ),
         launch_arguments={
-            'camera_name': 'camera_02',
-            'usb_port': '2-1.2.1',
+            'camera_name': 'right',
+            'usb_port': '2-2',
+            'serial_number': 'CP05353000D9',
             'device_num': '2',
             'sync_mode': 'standalone'
         }.items()
