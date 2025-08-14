@@ -50,7 +50,7 @@ COPY entrypoint.sh /root/entrypoint.sh
 
 RUN . /opt/ros/humble/setup.sh && \
     cd $WORKDIR && \
-    colcon build --symlink-install
+    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 RUN echo 'alias sos="source /opt/ros/humble/setup.bash"' >> /root/.bashrc && \
     echo 'alias sis="source install/setup.bash"' >> /root/.bashrc && \
